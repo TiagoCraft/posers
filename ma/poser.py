@@ -9,7 +9,7 @@ Two main System subclasses are defined in this module:
 """
 from collections import OrderedDict
 
-from ma import attribute, cmds, system
+from ma import attribute, cmds, node
 from py import IndexableGenerator
 
 from . import control, reader

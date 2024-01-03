@@ -1,7 +1,6 @@
 from collections import OrderedDict
 
-from maya import cmds
-from maya.api import OpenMaya as om
+from . import cmds, om
 
 SYSTEM_TYPE_ATTR_NAME = 'system_type'
 

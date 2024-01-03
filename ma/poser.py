@@ -9,10 +9,8 @@ Two main System subclasses are defined in this module:
 """
 from collections import OrderedDict
 
-from ma import attribute, cmds, node
-from py import IndexableGenerator
-
-from . import control, reader
+from ..py import IndexableGenerator
+from . import attribute, cmds, control, node, reader
 
 POSERSET_ATTR_NAME = 'poser_set'
 REPRESENTANT_ATTR_NAME = 'representant'

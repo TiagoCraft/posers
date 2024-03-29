@@ -2,6 +2,36 @@ import functools
 import itertools
 
 
+class ContextManager:
+    """Baseclass for context managers that can also be used as decorators.
+
+    Examples:
+        .. code-block:: python
+
+            with ContextManager() as cm:
+                print(cm)
+
+            @ContextManager()
+            def foo():
+                print("bar")
+    """
+
+    def __call__(self, func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            with self:
+                return func(*args, **kwargs)
+        return wrapper
+
+    def __enter__(self):
+        # Implement this method in subclasses
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_traceback):
+        # Implement this method in subclasses
+        pass
+
+
 class IndexableGenerator:
     """Implement Sequence functionalities to a generator object.
 

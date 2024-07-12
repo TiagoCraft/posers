@@ -1,7 +1,7 @@
 import shiboken2
 from maya import OpenMayaUI
 
-from ...py.ui import QtCore, QtGui, QtWidgets  # noqa
+from py_ui import QtCore, QtGui, QtWidgets  # noqa
 
 
 def get_maya_window() -> QtWidgets.QMainWindow:

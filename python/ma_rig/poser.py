@@ -9,8 +9,8 @@ Two main System subclasses are defined in this module:
 """
 from collections import OrderedDict
 
-from ..py import IndexableGenerator
-from . import attribute, cmds, control, node, reader
+from ma import attribute, cmds, node  # control, reader
+from py import IndexableGenerator
 
 POSERSET_ATTR_NAME = 'poser_set'
 REPRESENTANT_ATTR_NAME = 'representant'
@@ -95,7 +95,7 @@ def get_posers(node):
             yield cls(input_node)
 
 
-class Poser(system.System):
+class Poser(node.System):
     """Abstract baseclass for Attribute Posers.
 
     Posers drive a given attribute with stored values that can be blended in.
@@ -135,7 +135,7 @@ class Poser(system.System):
         Returns:
             Poser: instance
         """
-        self = super().create()
+        self: Poser = super().create()
         cmds.addAttr(self.name, ln=POSERSET_ATTR_NAME, at='message')
         cmds.addAttr(self.name, ln=REPRESENTANT_ATTR_NAME, at='message')
         self.representant = representant
@@ -155,17 +155,17 @@ class Poser(system.System):
     def get_class(node):
         """Find the adequate Poser subclass to instantiate from a root node.
 
-        If the node is not a proper poser root, None's returned, so this
-        method can also be used to query if a node wether a Poser.
+        If the node is not a proper poser root, None is returned, so this
+        method can also be used to query if a node is a Poser.
 
         Args:
             node (str): name of a maya node (supposedly a Poser)
 
         Returns:
             class or None:
-                the adequate Poser sub-class to instantiate from input node
+                the adequate Poser subclass to instantiate from input node
         """
-        cls = system.factory.get_system_class(node)
+        cls = node.factory.get_system_class(node)
         if cls is not None and issubclass(cls, Poser):
             return cls
 
@@ -654,7 +654,7 @@ POSERS_MAP = {
 }
 
 
-class PoserSet(system.System):
+class PoserSet(node.System):
     """A Poser coordinately driving several attributes with Attribute Posers.
 
     Each pose can drive one or more of the attributes driven by the PoserSet.
@@ -987,8 +987,8 @@ class PoserSet(system.System):
         Returns:
             list of reader.ConeReader: each child ConeReader instance
         """
-        return system.get_systems_tree(self, 0, reader.Reader).keys()
+        return node.get_systems_tree(self, 0, reader.Reader).keys()
 
 
-system.factory.register(Poser)
-system.factory.register(PoserSet)
+node.factory.register(Poser)
+node.factory.register(PoserSet)

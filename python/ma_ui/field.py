@@ -2,8 +2,9 @@ from math import ceil
 from numbers import Number
 from typing import Optional, Tuple
 
-from ...py.ui import field
-from .. import cmds, attribute_state
+from ma import attribute, cmds
+from py_ui import field
+
 from . import QtCore, QtGui, QtWidgets
 
 
@@ -152,7 +153,7 @@ class MaSlider(field.Slider):
         self.label.hide()
         if event.button() == QtCore.Qt.MiddleButton:
             attr = self.attr
-            if attribute_state(attr) < 3:
+            if attribute.state(attr) < 3:
                 cmds.setKeyframe(attr)
             else:
                 cmds.cutKey(attr, time=(cmds.currentTime(q=1),))

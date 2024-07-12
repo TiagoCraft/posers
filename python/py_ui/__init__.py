@@ -1,7 +1,7 @@
 from functools import partial
 from typing import Callable, Iterable, Optional, Sequence, Tuple
 
-from qtpy import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtGui, QtWidgets  # noqa
 
 Qt = QtCore.Qt
 DIRECTIONS = [
@@ -29,7 +29,7 @@ class MultiButton(QtWidgets.QWidget):
 
     def __init__(
             self,
-            actions: Tuple[Tuple[str, Callable]],
+            actions: tuple[tuple[str, Callable]],
             parent: Optional[QtWidgets.QWidget] = None,
             act_on_switch: bool = True):
         """Default constructor.
@@ -72,7 +72,7 @@ class MultiButton(QtWidgets.QWidget):
         self.actions = actions
 
     @property
-    def actions(self) -> Iterable[Tuple[str, Callable]]:
+    def actions(self) -> Iterable[tuple[str, Callable]]:
         """Get/Set the option actions of the button's menu.
 
         Args:
@@ -80,14 +80,14 @@ class MultiButton(QtWidgets.QWidget):
             of each option in the button's menu.
 
         Returns:
-            pairs with the name and behavior
-            of each option in the button's menu.
+            pairs with the name and behavior of each option in the button's
+            menu.
 
         """
         return self._actions
 
     @actions.setter
-    def actions(self, value: Sequence[Tuple[str, Callable]]):
+    def actions(self, value: Sequence[tuple[str, Callable]]):
         self._actions = value
         menu = QtWidgets.QMenu(self)
         for x in value:
@@ -96,7 +96,7 @@ class MultiButton(QtWidgets.QWidget):
         self.switch_btn.setMenu(menu)
         self.switch(value[0])
 
-    def switch(self, action: Tuple[str, Callable]):
+    def switch(self, action: tuple[str, Callable]):
         """Update the current action of the button.
 
         Args:
@@ -108,7 +108,7 @@ class MultiButton(QtWidgets.QWidget):
         self.current_action = action[1]
         self.act_btn.clicked.connect(action[1])
 
-    def switch_act(self, action: Tuple[str, Callable]):
+    def switch_act(self, action: tuple[str, Callable]):
         """Update the current action of the button and fire it.
 
         Args:
@@ -118,3 +118,7 @@ class MultiButton(QtWidgets.QWidget):
         self.switch(action)
         if self.act_on_switch:
             action[1]()
+
+
+factory: dict[str, QtWidgets.QWidget] = {}
+"""Factory of de/serializable widgets"""

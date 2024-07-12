@@ -1,5 +1,6 @@
+from py import fuzzy_match
+
 from . import QtCore
-from .. import fuzzy_match
 
 
 class ProxyModel(QtCore.QSortFilterProxyModel):
@@ -13,41 +14,40 @@ class ProxyModel(QtCore.QSortFilterProxyModel):
       - **fuzzy**: looks for a non-consecutive sequence of characters. E.g:
         'hello world' will match the pattern 'hwd', but not 'hdw.
 
-    Searches can also be case sensitive or insensitive.
-
-    Attributes:
+    Searches can also be case-sensitive or insensitive.
     """
 
-    filter_pattern = ''
-    """str: sequence of characters used to filter items with fuzzy find."""
-    search_method = 1
-    """int: 0 = Regex; 1 = fuzzy. Default: 1"""
-    case_sensitive = False
-    """bool: If true, take character case into account. Default: False"""
+    filter_pattern: str = ''
+    """sequence of characters used to filter items with fuzzy find."""
+    search_method: int = 1
+    """0 = Regex; 1 = fuzzy. Default: 1"""
+    case_sensitive: bool = False
+    """If true, take character case into account. Default: False"""
 
-    def __init__(self, model):
+    def __init__(self, model: QtCore.QAbstractItemModel):
         """Default constructor.
 
         Args:
-            model (QtCore.QAbstractItemModel): source model for this proxy.
+            model: source model for this proxy.
         """
         super().__init__()
         self.setSourceModel(model)
         self.setDynamicSortFilter(True)
         self.setFilterKeyColumn(-1)
 
-    def fuzzy_filter(self, source_row, source_index):
+    def fuzzy_filter(
+            self, source_row: int, source_index: QtCore.QModelIndex) -> bool:
         """Fuzzy matching method for filtering items in the proxy model.
 
         Recursively checks if any children of a given row passes the filter,
         in which case this row does too.
 
         Args:
-            source_row (int): a row under the source_index QModelIndex
-            source_index (QtCore.QModelIndex): holder of the input source_row.
+            source_row: a row under the source_index QModelIndex
+            source_index: holder of the input source_row.
 
         Returns:
-            bool: True if a row is valid, False otherwise.
+            True if a row is valid, False otherwise.
         """
         def recursion(row, parent_index):
             index = model.index(row, 0, parent_index)
@@ -76,18 +76,19 @@ class ProxyModel(QtCore.QSortFilterProxyModel):
             return True
         return recursion(source_row, source_index)
 
-    def regex_filter(self, source_row, source_index):
+    def regex_filter(
+            self, source_row: int, source_index: QtCore.QModelIndex) -> bool:
         """Traditional regex method to filter items in this proxy model.
 
         Recursively checks if any children of a given row passes the filter,
         in which case this row does too.
 
         Args:
-            source_row (int): a row under the source_index QModelIndex
-            source_index (QtCore.QModelIndex): holder of the input source_row.
+            source_row: a row under the source_index QModelIndex
+            source_index: holder of the input source_row.
 
         Returns:
-            bool: True if a row is valid, False otherwise.
+            True if a row is valid, False otherwise.
         """
         def recursion(row, parent_index):
             index = model.index(row, 0, parent_index)
@@ -108,7 +109,8 @@ class ProxyModel(QtCore.QSortFilterProxyModel):
         model = self.sourceModel()
         return recursion(source_row, source_index)
 
-    def filterAcceptsRow(self, source_row, source_index):
+    def filterAcceptsRow(
+            self, source_row: int, source_index: QtCore.QModelIndex) -> bool:
         """Redefinition of super method.
 
         Recursively checks if any children of a given row passes the filter,
@@ -119,23 +121,26 @@ class ProxyModel(QtCore.QSortFilterProxyModel):
             source_index (QtCore.QModelIndex): holder of the input source_row.
 
         Returns:
-            bool: True if a row is valid, False otherwise.
+            True if a row is valid, False otherwise.
         """
         f = self.fuzzy_filter if self.search_method == 1 else self.regex_filter
         return f(source_row, source_index)
 
-    def search(self, text, search_method=1, case_sensitive=False):
+    def search(
+            self,
+            text: str,
+            search_method: int = 1,
+            case_sensitive: bool = False):
         """Sets the expression for filtering what source data to show.
 
         If an empty string is passed, all the source content is included.
 
         Args:
-            text (str): search string. Accepts wildcards syntax.
-            search_method (int, optional): informs which search method to use:
+            text: search string. Accepts wildcards syntax.
+            search_method: informs which search method to use:
                 either regex (0) or fuzzy match (1). Default: 1
-            case_sensitive (bool, optional): If set to True, only match
-                characters to the pattern if they have the same case.
-                Default: False
+            case_sensitive: If set to True, only match characters to the pattern
+                if they have the same case.
         """
         self.filter_pattern = text
         self.search_method = search_method

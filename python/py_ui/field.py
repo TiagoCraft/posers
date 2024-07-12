@@ -1,19 +1,19 @@
 from math import ceil
 from numbers import Number
-from typing import Any, Callable, Optional, Tuple
+from typing import Callable, Optional
 
 from . import QtCore, QtGui, QtWidgets
 
 
 class LineEditWithDel(QtWidgets.QLineEdit):
-    """QLineEdit with a popup clear button.
+    """QLineEdit with a popup clear button."""
 
-    Attributes:
-        btn (QtWidgets.QPushButton):
-        listeners (list of function): holds functions to be called in order
-            upon an editingFinished signal. These functions are called with the
-            new text value of this widget as an argument.
-    """
+    btn: QtWidgets.QPushButton
+    """integrated clear button."""
+    listeners: list[Callable]
+    """holds functions to be called in order upon an editingFinished signal.
+    These functions are called with the new text value of this widget as an
+    argument."""
 
     def __init__(self, *args, **kwargs):
         """Default constructor."""
@@ -75,7 +75,7 @@ class Slider(QtWidgets.QLineEdit):
     click+drag gestures from simple clicks with residual unintentional drag."""
     label: QtWidgets.QLabel
     """Displays the step value while clicking."""
-    bounds: Tuple[Optional[Number], Optional[Number]]
+    bounds: tuple[Optional[Number], Optional[Number]]
     """Minimum and maximum values for the slider. If any boundary is None, the
     slider won't have a lower and/or upper bound."""
     lock_mouse: bool = True
@@ -88,7 +88,7 @@ class Slider(QtWidgets.QLineEdit):
     def __init__(
             self,
             default_value: Optional[Number] = None,
-            bounds: Tuple[Optional[Number], Optional[Number]] = (None, None),
+            bounds: tuple[Optional[Number], Optional[Number]] = (None, None),
             step: Optional[Number] = None,
             parent: Optional[QtWidgets.QWidget] = None):
         """Default constructor.
@@ -163,7 +163,12 @@ class Slider(QtWidgets.QLineEdit):
                else float)
         return cls(txt)
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QtGui.QKeyEvent):
+        """Arrow up and down keys will increment and decrement the value.
+
+        Args:
+            event: The triggered event.
+        """
         key = event.key()
         if key in [16777235, 16777237]:
             step = self.default_step
@@ -235,7 +240,7 @@ class Slider(QtWidgets.QLineEdit):
         """Prepare a click or click+drag gesture.
 
         Stores the cursor position and value, resets the offset and threshold,
-        sets step back to it's default value and shows the step label.
+        sets step back to its default value and shows the step label.
 
         Args:
             event: The triggered event.
@@ -361,13 +366,11 @@ class SearchBar(QtWidgets.QWidget):
 
     It allows filtering ProxyModel items using a pattern string and choosing
     from  available search methods and their variations.
-
-    Attributes:
-        search_listeners (list of function): list of functions to call when the
-            text in the search line is edited - typically, the search() method
-            from the associated View's ProxyModel.
     """
 
+    search_listeners: list[Callable]
+    """list of functions to call when the text in the search line is edited -
+    typically, the search() method from the associated View's ProxyModel."""
     _search_method = 1
     _case_sensitive = False
 
@@ -410,7 +413,7 @@ class SearchBar(QtWidgets.QWidget):
         btn.setMenu(menu)
         btn.clicked.connect(btn.showMenu)
 
-    def search(self, text):
+    def search(self, text: str):
         """Trigger all the listening functions with the search arguments.
 
         These arguments are the input pattern, search method and case
@@ -418,7 +421,7 @@ class SearchBar(QtWidgets.QWidget):
         Called when the text line in this widget is edited.
 
         Args:
-            text (str): search pattern as per the LineEditWithDel sub-widget.
+            text: search pattern as per the LineEditWithDel sub-widget.
         """
         search_method = self.search_method
         case_sensitive = self.case_sensitive
@@ -434,41 +437,41 @@ class SearchBar(QtWidgets.QWidget):
         self.search_method = 1 - self.search_method
 
     @property
-    def case_sensitive(self):
+    def case_sensitive(self) -> bool:
         """Get/Set the case_sensitive attribute and trigger the search signal
 
         If True, take character case into account. Default: False.
 
         Args:
-            value (bool): new value for the case sensitivity attribute.
+            value: new value for the case sensitivity attribute.
 
         Returns:
-            bool: current case_sensitive value.
+            current case_sensitive value.
         """
         return self._case_sensitive
 
     @case_sensitive.setter
-    def case_sensitive(self, value):
+    def case_sensitive(self, value: bool):
         self._case_sensitive = value
         self.cs_action.setChecked(value)
         self.search(self.line.text())
 
     @property
-    def search_method(self):
+    def search_method(self) -> int:
         """Get/Set the search_method attribute and trigger the search signal
 
         Can be regex (0) or fuzzy (1) matching. Default: 1
 
         Args:
-            value (int): new value for the search_method attribute.
+            value: new value for the search_method attribute.
 
         Returns:
-            int: current search_method value.
+            current search_method value.
         """
         return self._search_method
 
     @search_method.setter
-    def search_method(self, value):
+    def search_method(self, value: int):
         self._search_method = value
         self.sm_action.setChecked(value)
         self.search(self.line.text())

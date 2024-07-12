@@ -1,0 +1,154 @@
+[
+  {
+    "type": "root",
+    "id": "dev",
+    "description": "pipeline",
+    "mounts": {
+      "local": {
+        "linux": "~/dev",
+        "windows": "~/dev"
+      },
+      "remote": {
+        "linux": "/nas1/dev",
+        "windows": "P:"
+      }
+    },
+    "children": [
+      {
+        "type": "folder",
+        "id": "git",
+        "description": "hub of git repositories",
+        "children": [
+          {
+            "type": "folder",
+            "id": "git repository",
+            "description": "git repository",
+            "nc": "{project}"
+          }
+        ]
+      },
+      {
+        "type": "folder",
+        "id": "scripts",
+        "description": "global definitions and scripts",
+        "children": [
+          {
+            "type": "file",
+            "id": "fs",
+            "description": "default FS configurations",
+            "nc": "fs.json"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "root",
+    "id": "users",
+    "description": "User folders. Locally private, and public on the remote.",
+    "mounts": {
+      "local": {
+        "linux": "/home",
+        "windows": "C:/Users"
+      },
+      "remote": {
+        "linux": "/nas1/users",
+        "windows": "U:"
+      }
+    },
+    "children": [
+      {
+        "type": "folder",
+        "id": "user",
+        "description": "Personal user folder.",
+        "nc": "{user}"
+      }
+    ]
+  },
+  {
+    "type": "root",
+    "id": "projects",
+    "description": "projects root folder",
+    "mounts": {
+      "remote": {
+        "linux": "/nas1/projects",
+        "windows": "Z:"
+      },
+      "local": {
+        "linux": "~/projects",
+        "windows": "~/projects"
+      }
+    },
+    "children": [
+      {
+        "type": "folder",
+        "id": "project",
+        "description": "project folder",
+        "nc": "{project}",
+        "children": [
+          {
+            "type": "folder",
+            "id": "project scripts",
+            "description": "project-specific definitions and scripts",
+            "nc": "scripts",
+            "children": [
+              {
+                "type": "file",
+                "id": "project fs",
+                "description": "project specific FS configurations",
+                "nc": "fs.json"
+              }
+            ]
+          },
+          {
+            "type": "folder",
+            "id": "assets",
+            "description": "assets root folder",
+            "children": [
+              {
+                "type": "folder",
+                "id": "asset",
+                "description": "asset folder",
+                "nc": "{asset}",
+                "children": [
+                  {
+                    "type": "folder",
+                    "id": "asset step",
+                    "nc": "{step}",
+                    "children": [
+                      {
+                        "type": "folder",
+                        "id": "asset version",
+                        "nc": "{version}",
+                        "children": [
+                          {
+                            "type": "file",
+                            "id": "asset file",
+                            "nc": "{name}.{ext}"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "folder",
+            "id": "sequences",
+            "description": "sequences root folder",
+            "children": [
+              {
+                "type": "folder",
+                "id": "sequence",
+                "nc": "{sequence}",
+                "description": "sequence folder"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

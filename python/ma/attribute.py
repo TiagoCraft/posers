@@ -1,8 +1,7 @@
-from maya import cmds, mel
-from maya.api import OpenMaya as om
+from . import cmds
 
 
-def attribute_state(attr: str) -> int:
+def state(attr: str) -> int:
     """Find the state of input attribute
 
     Args:

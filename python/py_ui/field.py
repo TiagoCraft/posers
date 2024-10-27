@@ -2,7 +2,86 @@ from math import ceil
 from numbers import Number
 from typing import Callable, Optional
 
-from . import QtCore, QtGui, QtWidgets
+from . import QtCore, QtGui, QtWidgets, view
+
+
+class ComboBox(QtWidgets.QComboBox):
+    """Expand QComboBox with a searchable popup List.
+    """
+
+    proxy_model: view.ProxyModel
+    """Proxy_view's model, based on the ComboBox's source model."""
+    proxy_view: QtWidgets.QListView
+    """Replaces the original view."""
+    search_bar: 'SearchBar'
+    """Used to filter the proxy_view."""
+
+    def __init__(self, *args, **kwargs):
+        """Default constructor."""
+        super().__init__(*args, **kwargs)
+
+        self.proxy_model = view.ProxyModel(self.model())
+
+        self.proxy_view = QtWidgets.QListView()
+        self.proxy_view.setModel(self.proxy_model)
+        self.proxy_view.setEditTriggers(self.proxy_view.NoEditTriggers)
+        self.proxy_view.clicked.connect(self.select)
+        self.proxy_view.keyPressEvent = self.key_press
+
+        self.search_bar = SearchBar()
+        self.search_bar.search_listeners.append(self.search)
+        self.search_bar.line.editingFinished.connect(self.proxy_view.setFocus)
+
+    def search(
+            self,
+            pattern: Optional[str] = None,
+            search_method: int = 1,
+            case_sensitive: bool = False):
+        """Filter the proxy model's content based on a string pattern.
+
+        Args:
+            pattern: only items with a text validating to the
+                search pattern will be displayed. If no string is passed,
+                remove the filtering and show all model items.
+            search_method: informs which search method to use:
+                either regex (0) or fuzzy match (1).
+            case_sensitive: If set to True, only match
+                characters to the pattern if they have the same case.
+        """
+        self.proxy_model.search(pattern, search_method, case_sensitive)
+
+    def select(self, index: QtCore.QModelIndex):
+        """Set current proxy_list selection as the ComboBox's selection.
+
+        Args:
+            index: proxy_model's (current) item index.
+        """
+        index = self.proxy_model.mapToSource(index).row()
+        if index > -1:
+            self.setCurrentIndex(index)
+            self.hidePopup()
+
+    def key_press(self, event: QtGui.QKeyEvent):
+        """If pressing enter on the proxy_view, apply current selection.
+
+        Args:
+            event: The triggered event.
+        """
+        view = self.proxy_view
+        if event.key() in (QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter):
+            self.select(view.currentIndex())
+        else:
+            super(QtWidgets.QListView, view).keyPressEvent(event)
+        event.accept()
+
+    def showPopup(self):
+        """Overloads base function to customize the popup."""
+        super().showPopup()
+        frame = self.findChild(QtWidgets.QFrame)
+        layout = frame.layout()
+        layout.addWidget(self.search_bar)
+        layout.addWidget(self.proxy_view)
+        self.search_bar.line.setFocus()
 
 
 class LineEditWithDel(QtWidgets.QLineEdit):
@@ -364,13 +443,13 @@ class Slider(QtWidgets.QLineEdit):
 class SearchBar(QtWidgets.QWidget):
     """Support widget for searching views with a ProxyModel.
 
-    It allows filtering ProxyModel items using a pattern string and choosing
+    It allows filtering  items using a pattern string and choosing
     from  available search methods and their variations.
     """
 
     search_listeners: list[Callable]
     """list of functions to call when the text in the search line is edited -
-    typically, the search() method from the associated View's ProxyModel."""
+    typically, the search() method from the associated View's ."""
     _search_method = 1
     _case_sensitive = False
 

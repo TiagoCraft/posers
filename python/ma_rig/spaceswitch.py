@@ -1140,7 +1140,7 @@ class SpaceSwitch(node.Node):
             func(targets, cns, rm=1)
 
     def serialize(self) -> OrderedDict:
-        """Serialize this SpaceSwitchGuide.
+        """Serialize this SpaceSwitch.
 
         Returns:
             json-compatible data required to recreate this SpaceSwitch.
